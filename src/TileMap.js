@@ -28,10 +28,10 @@ export default class TileMap {
 
   async loadImages() {
     const imagePromises = [
-      this.loadImage("../images/floor.png"),
-      this.loadImage("../images/wall.png"),
-      this.loadImage("../images/node.png"),
-      this.loadImage("../images/door.png"),
+      this.loadImage(this.floor.src),
+      this.loadImage(this.wall.src),
+      this.loadImage(this.node.src),
+      this.loadImage(this.door.src),
     ];
 
     const [floor, wall, node, door] = await Promise.all(imagePromises);
@@ -42,7 +42,7 @@ export default class TileMap {
     this.door = door;
   }
 
-    loadImage(src) {
+  loadImage(src) {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
