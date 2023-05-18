@@ -42,6 +42,33 @@ export default class TileMap {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
+  loadImages() {
+    const imagePromises = [];
+  
+    imagePromises.push(new Promise((resolve, reject) => {
+      this.floor.onload = resolve;
+      this.floor.onerror = reject;
+    }));
+  
+    imagePromises.push(new Promise((resolve, reject) => {
+      this.wall.onload = resolve;
+      this.wall.onerror = reject;
+    }));
+  
+    imagePromises.push(new Promise((resolve, reject) => {
+      this.node.onload = resolve;
+      this.node.onerror = reject;
+    }));
+  
+    imagePromises.push(new Promise((resolve, reject) => {
+      this.door.onload = resolve;
+      this.door.onerror = reject;
+    }));
+  
+    return Promise.all(imagePromises);
+  }
+  
+
   draw(ctx) {
     if (!this.areImagesLoaded()) {
       this.loadImages().then(() => {
