@@ -67,44 +67,48 @@ export default class TileMap {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-  async draw(ctx) {
-    if (!this.areImagesLoaded()) {
-      await this.loadImages();
-    }
-  
-    for (let row = 0; row < this.map.length; row++) {
-      for (let column = 0; column < this.map[row].length; column++) {
-        let tile = this.map[row][column];
-        if (tile === 1) {
-          this.#drawWall(ctx, column, row, this.tileSize);
-        } else if (tile === 0) {
-          this.#drawFloor(ctx, column, row, this.tileSize);
-        } else if (
-          tile === 7 ||
-          tile === 8 ||
-          tile === 9 ||
-          tile === 10 ||
-          tile === 11 ||
-          tile === 12
-        ) {
-          this.#drawNode(ctx, column, row, this.tileSize);
-        } else if (tile === 4 || tile === 5 || tile === 6) {
-          this.#drawDoor(ctx, column, row, this.tileSize);
-        }
+draw(ctx) {
+  if (!this.areImagesLoaded()) {
+    this.loadImages().then(() => {
+      this.draw(ctx);
+    });
+    return;
+  }
+
+  for (let row = 0; row < this.map.length; row++) {
+    for (let column = 0; column < this.map[row].length; column++) {
+      let tile = this.map[row][column];
+      if (tile === 1) {
+        this.#drawWall(ctx, column, row, this.tileSize);
+      } else if (tile === 0) {
+        this.#drawFloor(ctx, column, row, this.tileSize);
+      } else if (
+        tile === 7 ||
+        tile === 8 ||
+        tile === 9 ||
+        tile === 10 ||
+        tile === 11 ||
+        tile === 12
+      ) {
+        this.#drawNode(ctx, column, row, this.tileSize);
+      } else if (tile === 4 || tile === 5 || tile === 6) {
+        this.#drawDoor(ctx, column, row, this.tileSize);
       }
     }
-  
-    // Draw the stickman after drawing the tiles
-    if (this.stickman) {
-      this.stickman.draw(ctx);
-    }
-  
-    // Draw text box and text
-    if (this.text !== "") {
-      this.#drawTextBox(ctx);
-      this.#drawText(ctx);
-    }
   }
+
+  // Draw the stickman after drawing the tiles
+  if (this.stickman) {
+    this.stickman.draw(ctx);
+  }
+
+  // Draw text box and text
+  if (this.text !== "") {
+    this.#drawTextBox(ctx);
+    this.#drawText(ctx);
+  }
+}
+
   
   areImagesLoaded() {
     return (
