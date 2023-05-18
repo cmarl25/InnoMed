@@ -5,17 +5,10 @@ export default class TileMap {
   constructor(tileSize) {
     this.tileSize = tileSize;
 
-    this.floor = new Image();
-    this.floor.src = "../images/floor.png";
-
-    this.wall = new Image();
-    this.wall.src = "../images/wall.png";
-
-    this.node = new Image();
-    this.node.src = "../images/node.png";
-
-    this.door = new Image();
-    this.door.src = "../images/door.png";
+    this.floor = this.loadImage("../images/floor.png");
+    this.wall = this.loadImage("../images/wall.png");
+    this.node = this.loadImage("../images/node.png");
+    this.door = this.loadImage("../images/door.png");
 
     this.text = ""; // Text to display
     this.textPosition = { x: 2, y: 2 }; // Position of the text box on the map
@@ -26,30 +19,12 @@ export default class TileMap {
     document.addEventListener("keydown", this.handleKeyPress);
   }
 
-  async loadImages() {
-    const imagePromises = [
-      this.loadImage(this.floor.src),
-      this.loadImage(this.wall.src),
-      this.loadImage(this.node.src),
-      this.loadImage(this.door.src),
-    ];
-
-    const [floor, wall, node, door] = await Promise.all(imagePromises);
-
-    this.floor = floor;
-    this.wall = wall;
-    this.node = node;
-    this.door = door;
-  }
-
   loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = (error) => reject(error);
-      image.src = src;
-    });
+    const image = new Image();
+    image.src = src;
+    return image;
   }
+  
 
   // 0-Floor, 1-Wall, 2-Stickman, 3-Node, 4-door
   map = [
@@ -67,47 +42,48 @@ export default class TileMap {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-draw(ctx) {
-  if (!this.areImagesLoaded()) {
-    this.loadImages().then(() => {
-      this.draw(ctx);
-    });
-    return;
-  }
-
-  for (let row = 0; row < this.map.length; row++) {
-    for (let column = 0; column < this.map[row].length; column++) {
-      let tile = this.map[row][column];
-      if (tile === 1) {
-        this.#drawWall(ctx, column, row, this.tileSize);
-      } else if (tile === 0) {
-        this.#drawFloor(ctx, column, row, this.tileSize);
-      } else if (
-        tile === 7 ||
-        tile === 8 ||
-        tile === 9 ||
-        tile === 10 ||
-        tile === 11 ||
-        tile === 12
-      ) {
-        this.#drawNode(ctx, column, row, this.tileSize);
-      } else if (tile === 4 || tile === 5 || tile === 6) {
-        this.#drawDoor(ctx, column, row, this.tileSize);
+  draw(ctx) {
+    if (!this.areImagesLoaded()) {
+      this.loadImages().then(() => {
+        this.draw(ctx);
+      });
+      return;
+    }
+  
+    for (let row = 0; row < this.map.length; row++) {
+      for (let column = 0; column < this.map[row].length; column++) {
+        let tile = this.map[row][column];
+        if (tile === 1) {
+          this.#drawWall(ctx, column, row, this.tileSize);
+        } else if (tile === 0) {
+          this.#drawFloor(ctx, column, row, this.tileSize);
+        } else if (
+          tile === 7 ||
+          tile === 8 ||
+          tile === 9 ||
+          tile === 10 ||
+          tile === 11 ||
+          tile === 12
+        ) {
+          this.#drawNode(ctx, column, row, this.tileSize);
+        } else if (tile === 4 || tile === 5 || tile === 6) {
+          this.#drawDoor(ctx, column, row, this.tileSize);
+        }
       }
     }
+  
+    // Draw the stickman after drawing the tiles
+    if (this.stickman) {
+      this.stickman.draw(ctx);
+    }
+  
+    // Draw text box and text
+    if (this.text !== "") {
+      this.#drawTextBox(ctx);
+      this.#drawText(ctx);
+    }
   }
-
-  // Draw the stickman after drawing the tiles
-  if (this.stickman) {
-    this.stickman.draw(ctx);
-  }
-
-  // Draw text box and text
-  if (this.text !== "") {
-    this.#drawTextBox(ctx);
-    this.#drawText(ctx);
-  }
-}
+  
 
   
   areImagesLoaded() {
